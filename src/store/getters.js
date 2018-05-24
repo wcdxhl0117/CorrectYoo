@@ -1,0 +1,1 @@
+export const showHeader = state => state.showHeader

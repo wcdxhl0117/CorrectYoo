@@ -1,0 +1,9 @@
+.mainWrap {
+  width: 100%;
+  position: absolute;
+  top: 180px;
+  left: 0;
+  right: 0;
+  bottom: 100px;
+  background: #999
+}
