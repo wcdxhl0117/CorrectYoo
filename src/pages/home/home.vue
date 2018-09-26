@@ -1,11 +1,5 @@
 <template>
   <div id="allWrapper">
-      <audio ref="bgMusic" id="audio" autoplay="autoplay" :src="tipMusic">
-        <source :src="tipMusic" type="audio/ogg">
-        <source :src="tipMusic" type="audio/mpeg">
-        <!-- http://pic.ibaotu.com/00/43/23/41F888piC5fv.mp3 -->
-        <!-- /static/step1.mp3 -->
-      </audio>
 
       <div class="index">
           <div class="index-top">
@@ -114,8 +108,7 @@ export default {
       tip: "你还没有进行认证，<br/>通过认证后才能批改题目", //内容
       sureTxt: "去认证",
       cancelTxt: "取消",
-      noCancel: true,
-      tipMusic: '/static/step1.mp3'
+      noCancel: true
     };
   },
   beforeRouteEnter(to, from, next) {
@@ -130,8 +123,6 @@ export default {
     this.backBTN();
   },
   mounted() {
-    this.checkMusic('/static/step1.mp3')
-
     let _this = this;
     setTimeout(() => {
       if (!cookie.get("DEVICE_TYPE") && cookie.get("S_L_S") != 1) {
@@ -168,15 +159,10 @@ export default {
       );
   },
   methods: {
-    checkMusic(src) {
-      this.tipMusic = src
-      this.$refs.bgMusic.play();
-    },
     toHelp() {
-      this.checkMusic('http://pic.ibaotu.com/00/43/23/41F888piC5fv.mp3')
-      // this.$router.push({
-      //   path: `/help`
-      // });
+      this.$router.push({
+        path: `/help`
+      });
     },
     toBalance() {
       this.$router.push({
@@ -213,10 +199,9 @@ export default {
     },
     // 跳转认证（弹窗确认，提示，个人中心按钮）
     certification() {
-      this.checkMusic('/static/step1.mp3')
-      // this.$router.push({
-      //   path: `/personal`
-      // });
+      this.$router.push({
+        path: `/personal`
+      });
     },
     firstTip() {
       this.$router.push({

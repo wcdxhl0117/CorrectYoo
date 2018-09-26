@@ -16,47 +16,47 @@
 
 <script type="text/ecmascript-6">
 export default {
-  props: {
-    // 是否有取消按钮,默认有
-    noCancel: {
-      type: Boolean,
-      default: true
+    props: {
+        // 是否有取消按钮,默认有
+        noCancel: {
+            type: Boolean,
+            default: true
+        },
+        text: {
+            type: String,
+            default: ''
+        },
+        confirmBtnText: {
+            type: String,
+            default: '确定'
+        },
+        cancelBtnText: {
+            type: String,
+            default: '取消'
+        }
     },
-    text: {
-      type: String,
-      default: ""
+    data() {
+        return {
+            showFlag: false
+        }
     },
-    confirmBtnText: {
-      type: String,
-      default: "确定"
-    },
-    cancelBtnText: {
-      type: String,
-      default: "取消"
+    methods: {
+        show() {
+            this.showFlag = true
+        },
+        hide() {
+            this.showFlag = false
+        },
+        cancel() {
+            this.hide()
+            this.$emit('cancel')
+        },
+        confirm() {
+            this.hide()
+            this.$emit('confirmNoTitle')
+        }
     }
-  },
-  data() {
-    return {
-      showFlag: false
-    };
-  },
-  methods: {
-    show() {
-      this.showFlag = true;
-    },
-    hide() {
-      this.showFlag = false;
-    },
-    cancel() {
-      this.hide();
-      this.$emit("cancel");
-    },
-    confirm() {
-      this.hide();
-      this.$emit("confirmNoTitle");
-    }
-  }
-};
+}
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">

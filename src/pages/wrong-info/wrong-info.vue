@@ -1,107 +1,105 @@
 <template>
   <div id="allWrapper">
       <div class="top">
-          <p>扣费时间：<span>2018-03-06</span></p>
-          <p>批错数量：<span>4题（2填空+2解答）</span></p>
-          <p>扣费：<span>-1.50</span></p>
+          <p>扣费时间：<span>{{thisDate}}</span></p>
+          <p>批错数量：<span>{{answerNum + fillNum}}题（{{fillNum}}填空+{{answerNum}}解答）</span></p>
+          <p>扣费：<span>{{deduction}}</span></p>
       </div>
       <!-- 主内容 -->
       <div class="theContent">
-          <div class="loop">
+          <div class="loop" v-for="item in arrTi">
               <!-- 填空结构 -->
-              <div class="completion">
+              <div v-if="item.question.type=='FILL_BLANK'" class="completion">
                   <div class="date_wrap">
-                    <p class="date_left">批改日期：2018-04-06</p>
-                    <p class="date_right" @click="lookInfo(123)">查看题干</p>
+                    <p class="date_left">批改日期：{{timestampToTime(item.studentHomeworkQuestion.correctAt)}}</p>
+                    <p class="date_right" @click="lookInfo(item.question.content)">查看题干</p>
                   </div>
                   <!-- 空循环结构 -->
-                  <div class="kong">
-                      <p class="k_p1">第1空</p>
+                  <div class="kong" v-for="(kong,index) in item.question.answers">
+                      <p class="k_p1">第{{index + 1}}空</p>
                       <div class="k_content">
                           <div class="k_con">
                               <span class="c_con_left">正确答案</span>
-                              <span class="c_con_right">12345678998976543211234567899897654321</span>
+                              <span class="c_con_right" v-html="parseTexMathContent(kong.content)"></span>
                           </div>
                           <div class="k_con">
                               <span class="c_con_left">作答答案</span>
-                              <span class="c_con_right">12345678998976543211234567899897654321</span>
+                              <span class="c_con_right" v-html="parseTexMathContent(item.studentHomeworkAnswers[index].content)"></span>
                           </div>
-                          <div class="k_con">
+                          <!-- 老数据没有批改记录数据，不展示批改结果对比 -->
+                          <div class="k_con" v-if="item.myResults">
                               <span class="c_con_left">我的批改结果</span>
                               <span class="c_con_right">
-                                  <img src="./quanduic.png" alt="">
-                                  <!-- <img src="./quancuoc.png" alt=""> -->
+                                  <img v-if="item.myResults[index]==='RIGHT'" src="./quanduic.png" alt="">
+                                  <img v-if="item.myResults[index]==='WRONG'" src="./quancuoc.png" alt="">
                               </span>
                           </div>
-                          <div class="k_con no_btm_border">
+                          <div class="k_con no_btm_border" v-if="item.otherResults">
                               <span class="c_con_left">二次批改结果</span>
                               <span class="c_con_right">
-                                  <!-- <img src="./quanduic.png" alt=""> -->
-                                  <img src="./quancuoc.png" alt="">
+                                  <img v-if="item.otherResults[index]==='RIGHT'" src="./quanduic.png" alt="">
+                                  <img v-if="item.otherResults[index]==='WRONG'" src="./quancuoc.png" alt="">
                               </span>
                           </div>
                       </div>
                   </div>
               </div>
               <!-- 解答题结构 -->
-              <div class="answer">
+              <div v-if="item.question.type=='QUESTION_ANSWERING'" class="answer">
                   <div class="date_wrap">
-                    <p class="date_left">批改日期：2018-04-06</p>
-                    <p class="date_right" @click="lookInfo(123)">查看题干</p>
+                    <p class="date_left">批改日期：{{timestampToTime(item.studentHomeworkQuestion.correctAt)}}</p>
+                    <p class="date_right" @click="lookInfo(item.question.content)">查看题干</p>
                   </div>
                   <div class="rightA">
                       <p class="rp1">正确答案</p>
-                      <p class="rp2">
-                          事件A、B、C至多发生两个的概率分别为75%和50%，事件A、B、 C至多发生两个的概率分别为75%和50%，事件A、B、C至
-                      </p>
+                      <p class="rp2" v-html="parseTexMathContent(item.question.answers[0].content)"></p>
                   </div>
                   <div class="stuAn">
                       <p>作答答案</p>
-                      <div>
-                         <img src="./banduic.png" alt="">
+                      <div v-for="img in item.studentHomeworkQuestion.answerImgs">
+                        <img :src="img" alt="">
                       </div>
                   </div>
-                  <div class="k_content">
+                  <div class="k_content" v-if="item.otherRightRate">
                     <div class="k_con">
                         <span class="c_con_left">我的批改结果</span>
                         <span class="c_con_right">
-                            <img src="./quanduic.png" alt="">
-                            <!-- <img src="./quancuoc.png" alt=""> -->
-                            <!-- <img src="./banduic.png" alt=""> -->
+                            <img v-if="item.myRightRate==100" src="./quanduic.png" alt="">
+                            <img v-if="item.myRightRate==0" src="./quancuoc.png" alt="">
+                            <img v-if="item.myRightRate!=100&&item.myRightRate!=0" src="./banduic.png" alt="">
                         </span>
                     </div>
-                    <div class="k_con no_btm_border">
+                    <div class="k_con no_btm_border" v-if="item.otherRightRate">
                         <span class="c_con_left">二次批改结果</span>
                         <span class="c_con_right">
-                            <!-- <img src="./quanduic.png" alt=""> -->
-                            <!-- <img src="./quancuoc.png" alt=""> -->
-                            <img src="./banduic.png" alt="">
+                            <img v-if="item.otherRightRate==100" src="./quanduic.png" alt="">
+                            <img v-if="item.otherRightRate==0" src="./quancuoc.png" alt="">
+                            <img v-if="item.otherRightRate!=100&&item.otherRightRate!=0" src="./banduic.png" alt="">
                         </span>
                     </div>
                 </div>
                   
               </div>
+          </div>
+      </div>
+      <div class="theContent">
+          <div class="loop" v-for="item in adminTi">
               <!-- 管理员抽查 -->
               <div class="checkUp">
                   <div class="date_wrap">
-                    <p class="date_left">批改日期：2018-04-06</p>
+                    <p class="date_left">批改日期：{{timestampToTime(item.correctAt)}}</p>
                     <p class="date_right"></p>
                   </div>
                   <div class="infos">
-                      <p>类型：管理员后台抽查</p>
-                      <p>原因：解答题批改错误</p>
-                      <p>描述：解答题批改错误</p>
+                      <p>类型：{{item.type}}</p>
+                      <p>原因：{{item.reason}}</p>
+                      <p>描述：{{item.description}}</p>
                       <p>截图：</p>
                   </div>
                   <div class="imgs">
                     <!-- tranImg -->
                     <div>
-                        <img class="tImg" src="./quanduic.png" alt="">
-                        <img @click="tranImg(0)" class="right" src="./xuan.png" alt="">
-                    </div>
-                    <div>
-                        <img class="tImg" src="./banduic.png" alt="">
-                        <img @click="tranImg(1)" class="right" src="./xuan.png" alt="">
+                        <img class="tImg" :src="item.imageUrl" alt="">
                     </div>
                   </div>
               </div>
@@ -113,7 +111,7 @@
               <div class="content">
                   <img class="closePop" @click="closePop" src="./close.png">
                   <p class="topHead">题干</p>
-                  <p class="tCon">{{nowTg}}</p>
+                  <p class="tCon" v-html="nowTg"></p>
               </div>
           </div>
       </div>
@@ -122,13 +120,20 @@
 
 <script>
 export default {
-  components: {  },
+  components: {},
   name: "wrong-info",
   data: function() {
     return {
       showPop: false,
-      nowTg: '',
-      current: []
+      nowTg: "",
+      thisDate: "",
+      fillNum: 0,
+      answerNum: 0,
+      deduction: 0,
+      arrTi: [], // 批错题目数组
+      adminTi: [], // 管理员扣费数组
+      myRe: [], // 我的批改结果数组
+      otherRe: [] // 其他人批改结果数组 
     };
   },
   beforeCreate: function() {
@@ -143,34 +148,125 @@ export default {
       });
     });
   },
-  created() {
-   
-  },
+  created() {},
   mounted() {
-    if(this.$route.query.d){
-        console.log(this.$route.query.d)
+    if (this.$route.query.d) {
+      console.log(this.$route.query.d);
+      let dateNun = parseInt(this.$route.query.d);
+      // 获取批错信息
+      this.$http
+        .post(
+          "/ycorrect/user/center/myErrorDetail",
+          {},
+          {
+            params: {
+              date: dateNun
+            }
+          }
+        )
+        .then(
+          response => {
+            console.log(response.data);
+            if (response.data.ret_code == 0) {
+              let res = response.data.ret;
+              this.thisDate = this.timestampToTime(parseInt(res.date));
+              this.fillNum = res.fills;
+              this.answerNum = res.answers;
+              this.deduction = res.errorFee;
+              this.arrTi = res.errorQuestions;
+              this.adminTi = res.manualFees;
+            //   修复操作后公示才解析的bug
+              window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub]);
+            } else {
+              this.$store.dispatch("ERROR_MESSAGE", response.data.ret_msg);
+            }
+          },
+          ({ response }) => {
+            this.loadTip = "";
+            this.$store.dispatch("ERROR_MESSAGE", "网络异常");
+          }
+        );
     }
-
-    // 初始化current
-    for(let i=0;i<2;i++){
-        this.current[i] = 0
-    }
-
   },
   methods: {
-    lookInfo(info){
-        this.showPop = true;
-        this.nowTg = info
+    lookInfo(info) {
+      this.showPop = true;
+      this.nowTg = this.parseTexMathContent(info);
     },
-    closePop(){
-        this.showPop = false;
-        this.nowTg = ''
+    closePop() {
+      this.showPop = false;
+      this.nowTg = "";
     },
-    tranImg(idx) {
-      this.current[idx] = (this.current[idx] + 90) % 360;
-      console.log(this.current[idx])
-      this.$el.querySelectorAll(".tImg")[idx].style.transform = "rotate(" + this.current[idx] + "deg)";
-      this.$el.querySelectorAll(".tImg")[idx].style.webkitTransform = "rotate(" + this.current[idx] + "deg)";
+    timestampToTime(timestamp) {
+      let date = new Date(timestamp); //如果timestamp为10位需要乘1000
+      let Y = date.getFullYear() + "-";
+      let M =
+        (date.getMonth() + 1 < 10
+          ? "0" + (date.getMonth() + 1)
+          : date.getMonth() + 1) + "-";
+      let D =
+        (date.getDate() < 10 ? "0" + date.getDate() : date.getDate()) + " ";
+      let h =
+        (date.getHours() < 10 ? "0" + date.getHours() : date.getHours()) + ":";
+      let m =
+        (date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()) +
+        ":";
+      let s =
+        date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
+      return Y + M + D;
+      // return Y+M+D+h+m+s;
+    },
+    // 渲染公式
+    parseTexMathContent: function(content) {
+      window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub]);
+      var txt = content.replace(
+        /<ux-blank sequence=\d+><\/ux-blank>/g,
+        "__________"
+      );
+      txt = txt.replace(
+        /<img[^>]+class="insert_fill_txt"[\s\S]*?>/g,
+        "__________"
+      );
+      txt = txt.replace(/<ux-mth>([^"]+?)<\/ux-mth>/g, function(
+        match,
+        capture
+      ) {
+        capture = capture.replace(/</g, "&lt;");
+        capture = capture.replace(/>/g, "&gt;");
+        capture = capture.replace(/\\$/gi, "");
+        capture = capture.replace(/\\upsi lon$/gi, "\\upsilon");
+        return "$" + capture + "$";
+      });
+      txt = txt.replace(/<table[\s\S]*?>([\s\S]*?)<\/table>/g, function(
+        match,
+        capture
+      ) {
+        return (
+          '<table class="table-bordered" style="width:100%">' +
+          capture.replace(/\n/g, "") +
+          "</table>"
+        );
+      });
+      txt = txt.replace(/\n/g, "<br/>");
+      return txt;
+    },
+    timestampToTime(timestamp) {
+        let date = new Date(timestamp) //如果timestamp为10位需要乘1000
+        let Y = date.getFullYear() + '-'
+        let M =
+        (date.getMonth() + 1 < 10
+            ? '0' + (date.getMonth() + 1)
+            : date.getMonth() + 1) + '-'
+        let D =
+        (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' '
+        let h =
+        (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
+        let m =
+        (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) +
+        ':'
+        let s =
+        date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+        return Y + M + D
     }
   },
   beforeDestroy: function() {
@@ -179,6 +275,8 @@ export default {
       .setAttribute("style", "background-color:#fff");
   }
 };
+
+
 </script>
 
 <style scoped>
@@ -193,6 +291,7 @@ export default {
   left: 0;
   bottom: 0;
   right: 0;
+  -webkit-overflow-scrolling: touch;
 }
 #allWrapper::-webkit-scrollbar{
   display: none;
@@ -218,7 +317,7 @@ export default {
     height: auto;
     background: #ffffff;
     padding: 20px;
-    margin-bottom:20px; 
+    margin-bottom:20px;
 }
 .completion,.answer,.checkUp{
     width: 100%;
@@ -276,7 +375,7 @@ export default {
     height: auto;
     line-height: 90px;
     min-height: 90px;
-    /* /* 圣杯核心 */ 
+    /* /* 圣杯核心 */
     margin-bottom: -10000px;
     padding-bottom: 10000px;
 }
@@ -292,6 +391,7 @@ export default {
     width: 480px;
     min-height: 90px;
     line-height: 90px;
+    overflow-x: auto;
     height: auto;
     /* 圣杯核心 */
     margin-bottom: -10000px;
@@ -310,13 +410,13 @@ export default {
 .answer .rightA{
     border-bottom: 1px solid #E5E5E5;
 }
-.answer .rightA .rp1{ 
+.answer .rightA .rp1{
      height: 70px;
      line-height: 70px;
      font-size: 24px;
      color: #383D48;
 }
-.answer .rightA .rp2{ 
+.answer .rightA .rp2{
      height: auto;
      line-height: 36px;
      font-size: 24px;

@@ -43,7 +43,7 @@
             <span>实名认证</span>
           </div>
           <div class="innerImg">
-            <img src="./eg.png" alt="">
+            <img src="./eg.jpg" alt="">
           </div>
           <p class="tipTxt">请提交身份证正面照片，确保文字清晰、无反光、无遮挡</p>
           <div class="innerBtn">

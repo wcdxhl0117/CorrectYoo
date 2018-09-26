@@ -27,126 +27,115 @@
         </div>
         <message></message>
         <loading :message="loadTip"></loading>
-         
     </div>
 </template>
 
 <script>
-import loading from "@/base/loading/loading";
-import message from "@/base/message";
-import cookie from "js-cookie";
-import { setTimeout } from "timers";
+import loading from '@/base/loading/loading'
+import message from '@/base/message'
+import cookie from 'js-cookie'
+import { setTimeout } from 'timers'
 export default {
-  components: { message, loading },
-  name: "login",
-  data: function() {
-    return {
-      user: {
-        username: "",
-        password: ""
-      },
-      loadTip: ""
-    };
-  },
-  created() {},
-  mounted() {
-    cookie.set("showHeader", false);
-    // let _this = this;
-    // if (cookie.get("S_L_S") == 1) {
-    //   cookie.set("showHeader", false);
-    //   this.$router.push({
-    //     path: `/home`
-    //   });
-    // }
-    this.backBTN();
-  },
-  methods: {
-    // this.$refs.videoT.volume = 0
-    submit: function() {
-      let _this = this;
-      // 设置是否显示头部
-      cookie.set("showHeader", true);
-      if (!this.user.username) {
-        this.$store.dispatch("ERROR_MESSAGE", "用户名不能为空");
-        return;
-      }
-      if (!this.user.password) {
-        this.$store.dispatch("ERROR_MESSAGE", "密码不能为空");
-        return;
-      } else {
-        this.loadTip = "正在登陆...";
-        this.$http
-          .post(
-            "/ycorrect/user/login",
-            {},
-            {
-              params: this.user
-            }
-          )
-          .then(
-            response => {
-              if (response.data.ret_code == 0) {
-                this.loadTip = "";
-                response.data.ret_msg = "登陆成功";
-                window.setTimeout(function() {
-                  console.log(1)
-                  _this.$router.push({
-                    path: `/home`
-                  });
-                }, 1500);
-              }
-              this.loadTip = "";
-              this.$store.dispatch("ERROR_MESSAGE", response.data.ret_msg);
+    components: { message, loading },
+    name: 'login',
+    data: function() {
+        return {
+            user: {
+                username: '',
+                password: ''
             },
-            ({ response }) => {
-              this.loadTip = "";
-              this.$store.dispatch("ERROR_MESSAGE", "网络异常");
-            }
-          );
-      }
-    },
-    backBTN() {
-      var _this = this;
-      /**
-       * 使用 HTML5 的 History 新 API pushState 来曲线监听 Android 设备的返回按钮
-       * XBack.listen(function(){
-          alert('oh! you press the back button');
-        });
-      */
-      !(function(pkg, undefined) {
-        var STATE = "x-back";
-        var element;
-        var onPopState = function(event) {
-          event.state === STATE && fire();
-        };
-        var record = function(state) {
-          history.pushState(state, null, location.href);
-        };
-        var fire = function() {
-          var event = document.createEvent("Events");
-          event.initEvent(STATE, false, false);
-          element.dispatchEvent(event);
-        };
-        var listen = function(listener) {
-          element.addEventListener(STATE, listener, false);
-        };
-        !function() {
-          element = document.createElement("span");
-          window.addEventListener("popstate", onPopState);
-          this.listen = listen;
-          this.record = record(STATE);
-          record(STATE);
-        }.call((window[pkg] = window[pkg] || {}));
-      })("XBack");
-      XBack.listen(function() {
-        // 点击返回键回掉
-        if (cookie.get("showHeader")) {
-          window.location.reload();
+            loadTip: ''
         }
-      });
+    },
+    created() {},
+    mounted() {
+        cookie.set('showHeader', false)
+        // let _this = this;
+        // if (cookie.get("S_L_S") == 1) {
+        //   cookie.set("showHeader", false);
+        //   this.$router.push({
+        //     path: `/home`
+        //   });
+        // }
+        this.backBTN()
+    },
+    methods: {
+        // this.$refs.videoT.volume = 0
+        submit: function() {
+            let _this = this
+            // 设置是否显示头部
+            cookie.set('showHeader', true)
+            if (!this.user.username) {
+                this.$store.dispatch("ERROR_MESSAGE", "用户名不能为空")
+                return
+            }
+            if (!this.user.password) {
+                this.$store.dispatch('ERROR_MESSAGE', '密码不能为空')
+                return
+            } else {
+                this.loadTip = '正在登陆...'
+                this.$http.post('/ycorrect/user/login', {}, {
+                    params: this.user 
+                }).then((response) => {
+                    if (response.data.ret_code == 0) {
+                        this.loadTip = ''
+                        response.data.ret_msg = '登陆成功'
+                        window.setTimeout(function() {
+                            _this.$router.push({
+                                path: `/home`
+                            })
+                        }, 1500)
+                    }
+                    this.loadTip = ''
+                    this.$store.dispatch('ERROR_MESSAGE', response.data.ret_msg)
+                }, ({ response }) => {
+                    this.loadTip = ''
+                    this.$store.dispatch('ERROR_MESSAGE', '网络异常')
+                })
+            }
+        },
+        backBTN() {
+            var _this = this
+            /**
+             * 使用 HTML5 的 History 新 API pushState 来曲线监听 Android 设备的返回按钮
+             * XBack.listen(function(){
+                alert('oh! you press the back button')
+              })
+            */
+            !(function(pkg, undefined) {
+                var STATE = 'x-back'
+                var element
+                var onPopState = function(event) {
+                    event.state === STATE && fire()
+                }
+                var record = function(state) {
+                    history.pushState(state, null, location.href)
+                }
+                var fire = function() {
+                    var event = document.createEvent('Events')
+                    event.initEvent(STATE, false, false)
+                    element.dispatchEvent(event)
+                }
+                var listen = function(listener) {
+                    element.addEventListener(STATE, listener, false)
+                }
+                !function() {
+                    element = document.createElement('span')
+                    window.addEventListener('popstate', onPopState)
+                    this.listen = listen
+                    this.record = record(STATE)
+                    record(STATE)
+                }.call((window[pkg] = window[pkg] || {}))
+            })('XBack')
+            XBack.listen(function() {
+                // 点击返回键回掉
+                if (cookie.get('showHeader')) {
+                    window.location.reload()
+                }
+            })
+        }
     }
-  }
-};
+}
 </script>
 
 <style scoped>

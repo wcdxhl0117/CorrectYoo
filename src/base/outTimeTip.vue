@@ -16,59 +16,59 @@
 
 <script type="text/ecmascript-6">
 export default {
-  props: {
-    tipHead: {
-      type: String,
-      default: ""
-    },
-    text: {
-      type: String,
-      default: ""
-    },
-    confirmBtnText: {
-      type: String,
-      default: "确定"
-    }
-  },
-  data() {
-    return {
-      showFlag: false,
-      timeNum: "30"
-    };
-  },
-  created() {
-    // this.theTime();
-  },
-  methods: {
-    show() {
-      this.showFlag = true;
-    },
-    hide() {
-      this.showFlag = false;
-    },
-    confirm() {
-      clearInterval(this.timer);
-      this.timeNum = "30";
-      this.hide();
-    },
-    theTime() {
-      let _this = this;
-      let count = 30;
-      clearInterval(this.timer);
-      this.timer = setInterval(() => {
-        if (count <= 0) {
-          clearInterval(_this.timer);
-          _this.showFlag = false;
-          //进入停止接题页面
-          _this.$emit("confirmStop");
-        } else {
-          count--;
+    props: {
+        tipHead: {
+            type: String,
+            default: ''
+        },
+        text: {
+            type: String,
+            default: ''
+        },
+        confirmBtnText: {
+            type: String,
+            default: '确定'
         }
-        _this.timeNum = count;
-      }, 1000);
+    },
+    data() {
+        return {
+            showFlag: false,
+            timeNum: '30'
+        }
+    },
+    created() {
+        // this.theTime()
+    },
+    methods: {
+        show() {
+            this.showFlag = true
+        },
+        hide() {
+            this.showFlag = false
+        },
+        confirm() {
+            clearInterval(this.timer)
+            this.timeNum = '30'
+            this.hide()
+        },
+        theTime() {
+            let _this = this
+            let count = 30
+            clearInterval(this.timer)
+            this.timer = setInterval(() => {
+                if (count <= 0) {
+                    clearInterval(_this.timer)
+                    _this.showFlag = false
+                    // 进入停止接题页面
+                    _this.$emit('confirmStop')
+                } else {
+                    count--
+                }
+                _this.timeNum = count
+            }, 1000)
+        }
     }
-  }
-};
+}
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">

@@ -1,203 +1,185 @@
 <template>
-    <div id="allWrapper">
-        <div class="balance">
-            <Header v-show="showHead==true" :title="title"></Header> 
-            <div class="info-card-detail bal-card-detail">
+    <div id='allWrapper'>
+        <div class='balance'>
+            <Header v-show='showHead==true' :title='title'></Header> 
+            <div class='info-card-detail bal-card-detail'>
                 <Scroll 
-                ref="secoller"
-                class="listview" 
+                ref='secoller'
+                class='listview' 
                 :class="{'noHaveheader':showHead}"
-                :data="allInfo" 
-                :pullUp="true"
-                :listenScroll="true"
-                :probeType="3"
-                @scrollToEnd="endSrcoll"
-                @scroll="scrollInfo"
+                :data='allInfo' 
+                :pullUp='true'
+                :listenScroll='true'
+                :probeType='3'
+                @scrollToEnd='endSrcoll'
+                @scroll='scrollInfo'
                 >
                   <ul>
-                     <li v-for="item in allInfo">
-                        <div class="card-detail-line card-detail-gray">
-                            <p class="p1">{{timestampToTime(item.date)}}</p>
-                            <p class="p2">批改{{item.correctCount}}题</p>
+                     <li v-for='item in allInfo'>
+                        <div class='card-detail-line card-detail-gray'>
+                            <p class='p1'>{{timestampToTime(item.date)}}</p>
+                            <p class='p2'>批改{{item.correctCount}}题</p>
                         </div>
-                        <div v-if="item.correctFee!=0" class="card-detail-line card-detail-cash">
-                            <p class="p1">批改费用</p>
-                            <p class="p2">＋{{item.correctFee.toFixed(2)}}</p>
+                        <div v-if='item.correctFee!=0' class='card-detail-line card-detail-cash'>
+                            <p class='p1'>批改费用</p>
+                            <p class='p2' v-if="item.correctFee>0">＋{{item.correctFee.toFixed(2)}}</p>
+                            <p class='p2' v-if="item.correctFee<0">{{item.correctFee.toFixed(2)}}</p>
                         </div>
-                        <div v-if="item.rewardFee!=0" class="card-detail-line card-detail-cash">
-                          <p class="p1">奖励</p>
-                          <p class="p2">＋{{item.rewardFee.toFixed(2)}}</p>
+                        <div v-if='item.rewardFee!=0' class='card-detail-line card-detail-cash'>
+                          <p class='p1'>奖励</p>
+                          <p class='p2'>＋{{item.rewardFee.toFixed(2)}}</p>
                       </div>
-                      <div v-if="item.withdrawFee!=0" class="card-detail-line card-detail-cash">
-                          <p class="p1">提现</p>
-                          <p class="p2">{{item.withdrawFee.toFixed(2)}}</p>
+                      <div v-if='item.withdrawFee!=0' class='card-detail-line card-detail-cash'>
+                          <p class='p1'>提现</p>
+                          <p class='p2'>{{item.withdrawFee.toFixed(2)}}</p>
                       </div>
-                      <div v-if="item.errorFee!=0" class="card-detail-line card-detail-cash">
-                          <p class="p1">批错扣费 <span class="xq" @click="toDetail(item.date)">&nbsp;&nbsp;详情</span></p>
-                          <p class="p2">{{item.errorFee.toFixed(2)}}</p>
+                      <div v-if='item.errorFee!=0' class='card-detail-line card-detail-cash'>
+                          <p class='p1'>批错扣费 <span class='xq' @click='toDetail(item.date)'>&nbsp;&nbsp;详情</span></p>
+                          <p class='p2'>{{item.errorFee.toFixed(2)}}</p>
                       </div>
-                      <div v-if="item.withdrawRefundFee!=0" class="card-detail-line card-detail-cash">
-                          <p class="p1">提现失败</p>
-                          <p class="p2">{{item.withdrawRefundFee.toFixed(2)}}</p>
+                      <div v-if='item.withdrawRefundFee!=0' class='card-detail-line card-detail-cash'>
+                          <p class='p1'>提现失败</p>
+                          <p class='p2'>{{item.withdrawRefundFee.toFixed(2)}}</p>
                       </div>
                     </li>
-                    <div ref="pullUp" class="bal-none">{{puUPLoding}}</div>
+                    <div ref='pullUp' class='bal-none'>{{puUPLoding}}</div>
                   </ul>
                 </Scroll>
             </div>
         </div>
-        <loading :message="loadTip"></loading>
+        <loading :message='loadTip'></loading>
         <message></message>
     </div>
 </template>
 
 <script>
-import loading from "@/base/loading/loading";
-import cookie from "js-cookie";
-import Header from "@/base/header";
-import Scroll from "@/base/scroll/scroll";
-import message from "@/base/message";
-
+import loading from '@/base/loading/loading'
+import cookie from 'js-cookie'
+import Header from '@/base/header'
+import Scroll from '@/base/scroll/scroll'
+import message from '@/base/message'
 export default {
-  components: { Header, Scroll, loading, message },
-  name: "balance_detail",
-  data: function() {
-    return {
-      showHead: false, //是否显示title栏
-      title: "余额明细", //标题栏内容
-      allInfo: [],
-      getDataOff: true, //上拉加载的开关
-      puUPLoding: "上拉加载更多",
-      scrollTop: "",
-      nextTimeTrp: "",
-      loadTip: ""
-    };
-  },
-  beforeRouteEnter(to, from, next) {
-    cookie.set("outKey", "0");
-    next(function(vm) {
-      vm.$client.system("documentTitle", {
-        title: "余额明细"
-      });
-    });
-  },
-  created() {
-    // 监听返回键
-    cookie.set("outKey", "0");
-    if (cookie.get("showHeader") == "true") {
-      this.showHead = true;
-    } else {
-      this.showHead = false;
-    }
-    let _this = this;
-    setTimeout(function() {
-      if (cookie.get("S_L_S") != 1) {
-        _this.$router.push({
-          path: `/login`
-        });
-      }
-    }, 100);
-    this.getDetail(this.nextTimeTrp);
-  },
-  mounted() {},
-  methods: {
-    toDetail(res) {
-      console.log(res)
-      // this.$router.push({
-      //   path: `/wrongInfo`,
-      //   query: {   
-      //       d: res 
-      //   }  
-      // });
+    components: { Header, Scroll, loading, message },
+    name: 'balance_detail',
+    data: function() {
+        return {
+            showHead: false, // 是否显示title栏
+            title: '余额明细', // 标题栏内容
+            allInfo: [],
+            getDataOff: true, // 上拉加载的开关
+            puUPLoding: '上拉加载更多',
+            scrollTop: '',
+            nextTimeTrp: '',
+            loadTip: ''
+        }
     },
-    endSrcoll() {
-      // 上拉加载
-      if (this.getDataOff) {
-        this.getDataOff = false;
-        console.log("上拉加载");
-        this.getDetail(this.nextTimeTrp);
-      }
+    beforeRouteEnter(to, from, next) {
+        cookie.set('outKey', '0')
+        next(function(vm) {
+            vm.$client.system('documentTitle', {
+                title: '余额明细'
+            })
+        })
     },
-    scrollInfo(pos) {
-      this.scrollTop = pos.y;
-      // console.log(this.scrollTop);
-    },
-    getDetail(timetrp) {
-      this.puUPLoding = "加载中...";
-      let _this = this;
-      this.$http
-        .post(
-          "/ycorrect/user/center/myBalance",
-          {},
-          {
-            params: {
-              lastBillDate: timetrp,
-              size: 20
+    created() {
+        // 监听返回键
+        cookie.set('outKey', '0')
+        if (cookie.get('showHeader') === 'true') {
+            this.showHead = true
+        } else {
+            this.showHead = false
+        }
+        let _this = this
+        setTimeout(function() {
+            if (cookie.get('S_L_S') !== '1') {
+                _this.$router.push({
+                    path: `/login`
+                })
             }
-          }
-        )
-        .then(
-          response => {
-            this.puUPLoding = "上拉加载更多";
-            this.getDataOff = true; //打开下拉加载的开关
-            // console.log(response.data.ret);
-            if (response.data.ret_code == 0) {
-              let data = response.data.ret;
-              if(data.correctBills.length<20){
-                this.getDataOff = false;
-                this.puUPLoding = "没有更多了";
-              }
-              for (let i = 0; i < data.correctBills.length; i++) {
-                this.nextTimeTrp = data.correctBills[i].date;
-                // data.correctBills[i].date = this.timestampToTime(
-                //   parseInt(data.correctBills[i].date)
-                // );
-                // 处理数据，看是否展示，那些数据展示
-                if (
-                  data.correctBills[i].correctFee == 0 &&
-                  data.correctBills[i].errorFee == 0 &&
-                  data.correctBills[i].rewardFee == 0 &&
-                  data.correctBills[i].withdrawFee == 0 &&
-                  data.correctBills[i].withdrawRefundFee == 0
-                ) {
-                  // 都为0，数据不要
-                } else {
-                  this.allInfo.push(data.correctBills[i]);
+        }, 100)
+        this.getDetail(this.nextTimeTrp)
+    },
+    mounted() {},
+    methods: {
+        toDetail(res) {
+            console.log(res)
+            this.$router.push({
+                path: `/wrongInfo`,
+                query: {   
+                    d: res
                 }
-              }
-              console.log(this.allInfo)
-            } else {
-              this.$store.dispatch("ERROR_MESSAGE", response.data.ret_msg);
+            })
+        },
+        endSrcoll() {
+            // 上拉加载
+            if (this.getDataOff) {
+                this.getDataOff = false
+                console.log('上拉加载')
+                this.getDetail(this.nextTimeTrp)
             }
-          },
-          ({ response }) => {
-            this.puUPLoding = "加载失败";
-            this.getDataOff = true; //打开下拉加载的开关
-             this.$store.dispatch("ERROR_MESSAGE", "网络异常");
-          }
-        );
-    },
-    timestampToTime(timestamp) {
-      let date = new Date(timestamp); //如果timestamp为10位需要乘1000
-      let Y = date.getFullYear() + "-";
-      let M =
-        (date.getMonth() + 1 < 10
-          ? "0" + (date.getMonth() + 1)
-          : date.getMonth() + 1) + "-";
-      let D =
-        (date.getDate() < 10 ? "0" + date.getDate() : date.getDate()) + " ";
-      let h =
-        (date.getHours() < 10 ? "0" + date.getHours() : date.getHours()) + ":";
-      let m =
-        (date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()) +
-        ":";
-      let s =
-        date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
-      return Y + M + D;
-      // return Y+M+D+h+m+s;
+        },
+        scrollInfo(pos) {
+            this.scrollTop = pos.y
+            // console.log(this.scrollTop)
+        },
+        getDetail(timetrp) {
+            this.puUPLoding = '加载中...'
+            let _this = this
+            this.$http.post('/ycorrect/user/center/myBalance', {}, {
+                params: {
+                    lastBillDate: timetrp,
+                    size: 20
+                }
+            }).then(response => {
+                this.puUPLoding = '上拉加载更多'
+                this.getDataOff = true //打开下拉加载的开关
+                // console.log(response.data.ret)
+                if (response.data.ret_code == 0) {
+                    let data = response.data.ret
+                    if (data.correctBills.length < 20) {
+                        this.getDataOff = false
+                        this.puUPLoding = '没有更多了'
+                    }
+                    for (let i = 0; i < data.correctBills.length; i++) {
+                        this.nextTimeTrp = data.correctBills[i].date
+                        // data.correctBills[i].date = this.timestampToTime(
+                        //   parseInt(data.correctBills[i].date)
+                        // )
+                        // 处理数据，看是否展示，那些数据展示
+                        if (data.correctBills[i].correctFee == 0 &&
+                            data.correctBills[i].errorFee == 0 &&
+                            data.correctBills[i].rewardFee == 0 &&
+                            data.correctBills[i].withdrawFee == 0 &&
+                            data.correctBills[i].withdrawRefundFee == 0
+                        ) {
+                            // 都为0，数据不要
+                        } else {
+                            this.allInfo.push(data.correctBills[i])
+                        }
+                    }
+                    console.log(this.allInfo)
+                } else {
+                    this.$store.dispatch('ERROR_MESSAGE', response.data.ret_msg)
+                }
+            }, ({ response }) => {
+              this.puUPLoding = '加载失败'
+              this.getDataOff = true // 打开下拉加载的开关
+              this.$store.dispatch('ERROR_MESSAGE', '网络异常')
+            })
+        },
+        timestampToTime(timestamp) {
+            let date = new Date(timestamp) // 如果timestamp为10位需要乘1000
+            let Y = date.getFullYear() + '-'
+            let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
+            let D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' '
+            let h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
+            let m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
+            let s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+            return Y + M + D
+            // return Y+M+D+h+m+s
+        }
     }
-  }
-};
+}
 </script>
 
 <style scoped>
@@ -257,7 +239,7 @@ export default {
 .balance-mountain {
   position: absolute;
   bottom: 0;
-  background: url("./balance_bg.jpg") no-repeat;
+  background: url('./balance_bg.jpg') no-repeat;
   width: 100%;
   height: 100%;
   background-size: 100% 100%;

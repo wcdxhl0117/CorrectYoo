@@ -16,62 +16,61 @@
 
 <script type="text/ecmascript-6">
 export default {
-  props: {
-    tipHead: {
-      type: String,
-      default: ""
+    props: {
+      tipHead: {
+        type: String,
+        default: ""
+      },
+      text: {
+        type: String,
+        default: ""
+      },
+      confirmBtnText: {
+        type: String,
+        default: "确定"
+      }
     },
-    text: {
-      type: String,
-      default: ""
+    data() {
+      return {
+        showFlag: false,
+        timeNum: "10"
+      };
     },
-    confirmBtnText: {
-      type: String,
-      default: "确定"
-    }
-  },
-  data() {
-    return {
-      showFlag: false,
-      timeNum: "10"
-    };
-  },
-  created() {
-    // this.theTime();
-  },
-  methods: {
-    show() {
-      this.showFlag = true;
+    created() {
+      // this.theTime();
     },
-    hide() {
-      this.showFlag = false;
-    },
-    confirm() {
-      clearInterval(this.timer);
-      this.timeNum = "10";
-      this.hide();
-      this.$emit("confirm");
-    },
-    theTime() {
-      let _this = this;
-      let count = 10;
-      clearInterval(this.timer);
-      this.timer = setInterval(() => {
-        if (count <= 0) {
-          clearInterval(this.timer);
-          _this.showFlag = false;
-          // 后台交互，停止
-
-          //进入停止接替页面
-          _this.$emit("confirmStop");
-        } else {
-          count--;
+    methods: {
+        show() {
+            this.showFlag = true
+        },
+        hide() {
+            this.showFlag = false
+        },
+        confirm() {
+            clearInterval(this.timer)
+            this.timeNum = '10'
+            this.hide()
+            this.$emit('confirm')
+        },
+        theTime() {
+            let _this = this
+            let count = 10
+            clearInterval(this.timer)
+            this.timer = setInterval(() => {
+                if (count <= 0) {
+                    clearInterval(this.timer)
+                    _this.showFlag = false
+                    // 后台交互，停止
+                    // 进入停止接替页面
+                    _this.$emit('confirmStop')
+                } else {
+                    count--
+                }
+                this.timeNum = count
+            }, 1000)
         }
-        this.timeNum = count;
-      }, 1000);
     }
-  }
-};
+}
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">

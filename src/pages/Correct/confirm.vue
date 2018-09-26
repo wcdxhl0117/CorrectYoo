@@ -17,70 +17,70 @@
 
 <script type="text/ecmascript-6">
 export default {
-  props: {
-    tipHead: {
-      type: String,
-      default: ""
-    },
-    // 是否有取消按钮,默认有
-    noCancel: {
-      type: Boolean,
-      default: false
-    },
-    text: {
-      type: String,
-      default: ""
-    },
-    confirmBtnText: {
-      type: String,
-      default: "确定"
-    },
-    cancelBtnText: {
-      type: String,
-      default: "取消"
-    }
-  },
-  data() {
-    return {
-      showFlag: false,
-      timeNum: "10"
-    };
-  },
-  methods: {
-    show() {
-      this.showFlag = true;
-    },
-    hide() {
-      this.showFlag = false;
-    },
-    cancel() {
-      this.hide();
-      this.$emit("cancel");
-    },
-    confirm() {
-      this.hide();
-      this.$emit("confirm");
-    },
-    theTime() {
-      let count = 10;
-      this.timer = setInterval(() => {
-        if (count <= 0) {
-          clearInterval(this.timer);
-          this.timer = null;
-          this.showFlag = false;
-          //进入停止接替页面
-          this.$emit("confirmStop");
-        } else {
-          count--;
-          // if (count < 10) {
-          //   count = "0" + count;
-          // }
+    props: {
+        tipHead: {
+            type: String,
+            default: ''
+        },
+        // 是否有取消按钮,默认有
+        noCancel: {
+            type: Boolean,
+            default: false
+        },
+        text: {
+            type: String,
+            default: ''
+        },
+        confirmBtnText: {
+            type: String,
+            default: '确定'
+        },
+        cancelBtnText: {
+            type: String,
+            default: '取消'
         }
-        this.timeNum = count;
-      }, 1000);
+    },
+    data() {
+        return {
+            showFlag: false,
+            timeNum: '10'
+        }
+    },
+    methods: {
+        show() {
+            this.showFlag = true
+        },
+        hide() {
+            this.showFlag = false
+        },
+        cancel() {
+            this.hide()
+            this.$emit("cancel")
+        },
+        confirm() {
+            this.hide()
+            this.$emit("confirm")
+        },
+        theTime() {
+            let count = 10
+            this.timer = setInterval(() => {
+                if (count <= 0) {
+                    clearInterval(this.timer)
+                    this.timer = null
+                    this.showFlag = false
+                    // 进入停止接替页面
+                    this.$emit("confirmStop")
+                } else {
+                    count--
+                    // if (count < 10) {
+                    //   count = "0" + count
+                    // }
+                }
+                this.timeNum = count
+            }, 1000)
+        }
     }
-  }
-};
+}
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">

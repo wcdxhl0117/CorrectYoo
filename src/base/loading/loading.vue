@@ -13,21 +13,21 @@
 
 <script>
 export default {
-  props: {
-    message: {
-      type: String,
-      default: ""
-    },
-    imgSrc: {
-      type: String,
-      default: require("./loadinngBg.png")
-    },
-    count: {
-      type: String,
-      default: ""
+    props: {
+        message: {
+            type: String,
+            default: ''
+        },
+        imgSrc: {
+            type: String,
+            default: require('./loadinngBg.png')
+        },
+        count: {
+            type: String,
+            default: ''
+        }
     }
-  }
-};
+}
 </script>
 
 <style scoped>

@@ -1,216 +1,202 @@
 <template>
-    <div id="allWrapper">
-        <Header v-show="showHead==true" :title="title"></Header> 
-        <div v-show="!dateIn" class="top_tip">{{firData.wrongTimeTip}}</div>
-        <div v-show="withdrawToday" class="top_tip ttip">你今天已经进行提现了，每日仅可提现1次</div>
-        <div class="clum">
+    <div id='allWrapper'>
+        <Header v-show='showHead==true' :title='title'></Header> 
+        <div v-show='!dateIn' class='top_tip'>{{firData.wrongTimeTip}}</div>
+        <div v-show='withdrawToday' class='top_tip ttip'>你今天已经进行提现了，每日仅可提现1次</div>
+        <div class='clum'>
           <p>真实姓名</p>
-          <input type="text" :value="firData.realName" readonly="readonly">
+          <input type='text' :value='firData.realName' readonly='readonly'>
         </div>
-        <div class="clum">
+        <div class='clum'>
           <p>支付宝账号</p>
-          <input @blur="getPayCount" v-model="paycount" type="text" placeholder="请输入支付宝账号">
-          <span class="ComentName">{{countName}}</span>
+          <input @blur='getPayCount' v-model='paycount' type='text' placeholder='请输入支付宝账号'>
+          <span class='ComentName'>{{countName}}</span>
         </div>
-        <p v-if="!notPass" class="theTip">请确认支付宝与小悠快批平台的实名认证信息相同</p>
-        <p v-if="notPass" class="theTip notPass">支付宝与小悠快批实名认证信息不一致，无法提现</p>
-        <div class="get_amount">
+        <p v-if='!notPass' class='theTip'>请确认支付宝与小悠快批平台的实名认证信息相同</p>
+        <p v-if='notPass' class='theTip notPass'>支付宝与小悠快批实名认证信息不一致，无法提现</p>
+        <div class='get_amount'>
           <p>提现金额（元）</p>
-          <input type="number" v-model="money" placeholder="请输入金额" @blur="moneyDraw" onkeyup="value=value.replace(/[^\d.]/g,'')">
+          <input type='number' v-model='money' placeholder='请输入金额' @blur='moneyDraw' onkeyup="value=value.replace(/[^\d.]/g,'')">
         </div>
-        <div class="btmTipWrap">
-          <p class="theTip">本次可提现<span>{{maxNum}}</span>元</p>
-          <p class="tipRight theTip">单次提现上限800元</p>
+        <div class='btmTipWrap'>
+          <p class='theTip'>本次可提现<span>{{maxNum}}</span>元</p>
+          <p class='tipRight theTip'>单次提现上限800元</p>
         </div>
-        <div @click="drawalCash" v-show="btnColor" class="sureBtn colorSure">确认提现 24小时内到账</div>
-        <div v-show="!btnColor" class="sureBtn">确认提现 24小时内到账</div>
+        <div @click='drawalCash' v-show='btnColor' class='sureBtn colorSure'>确认提现 24小时内到账</div>
+        <div v-show='!btnColor' class='sureBtn'>确认提现 24小时内到账</div>
         <!-- message提示 -->
         <Message></Message>
         <!-- 成功弹窗提示 -->
-        <classMessage :message="SuccessTip"></classMessage>
+        <classMessage :message='SuccessTip'></classMessage>
         <!-- loading组件 -->
-        <loading :message="loadTip"></loading>
+        <loading :message='loadTip'></loading>
     </div>
 </template>
 
 <script>
-import cookie from "js-cookie";
-import Header from "@/base/header";
-import loading from "@/base/loading/loading";
-import Message from "@/base/message";
-import classMessage from "@/base/classMessage";
+import cookie from 'js-cookie'
+import Header from '@/base/header'
+import loading from '@/base/loading/loading'
+import Message from '@/base/message'
+import classMessage from '@/base/classMessage'
 export default {
-  components: { Header, loading, Message, classMessage },
-  name: "withdrawal",
-  data: function() {
-    return {
-      showHead: false, //是否显示title栏
-      title: "提现", //标题栏内容
-      firData: {},
-      dateIn: true, //是否在规定时间内
-      countName: "", //支付宝账号验证返回的实名信息
-      notPass: false, //支付宝实名和平台实名不一致true
-      maxNum: "", //可提现金额
-      paycount: "",
-      money: "",
-      countOk: false, //账号是否ok
-      moneyOk: false, //金额是否ok
-      withdrawToday: false, //今日是否已经体现,true为已提现
-      loadTip: "",
-      SuccessTip: ""
-    };
-  },
-  beforeCreate: function() {
-    document
-      .getElementsByTagName("body")[0]
-      .setAttribute("style", "background-color:#e9e9eb");
-  },
-  beforeRouteEnter(to, from, next) {
-    next(function(vm) {
-      vm.$client.system("documentTitle", {
-        title: "提现"
-      });
-    });
-  },
-  created() {
-    // 监听返回键
-    cookie.set("outKey", "0");
-    if (cookie.get("showHeader") == "true") {
-      this.showHead = true;
-    } else {
-      this.showHead = false;
-    }
-    let _this = this;
-    setTimeout(function() {
-      if (cookie.get("S_L_S") != 1) {
-        _this.$router.push({
-          path: `/login`
-        });
-      }
-    }, 100);
-    this.drawInfo();
-  },
-  methods: {
-    getPayCount() {
-      // 失去焦点验证(暂时不做)
-      if (this.paycount) {
-        // 输入了信息，并失去焦点，后端交互
-        // 后端验证通过并且正确输了金额后，按钮颜色变为可点击
-        // this.loadTip = "正在验证";
-        // 支付宝验证
-        this.countOk = true;
-      } else {
+    components: { Header, loading, Message, classMessage },
+    name: 'withdrawal',
+    data: function() {
+      return {
+        showHead: false, //是否显示title栏
+        title: '提现', //标题栏内容
+        firData: {},
+        dateIn: true, //是否在规定时间内
+        countName: '', //支付宝账号验证返回的实名信息
+        notPass: false, //支付宝实名和平台实名不一致true
+        maxNum: '', //可提现金额
+        paycount: '',
+        money: '',
+        countOk: false, //账号是否ok
+        moneyOk: false, //金额是否ok
+        withdrawToday: false, //今日是否已经体现,true为已提现
+        loadTip: '',
+        SuccessTip: '',
+        offDraw: true
       }
     },
-    // 金额验证截取
-    moneyDraw() {
-      this.moneyOk = false;
-      if (this.money) {
-        let m = this.money.split(".");
-        let m1 = m[0];
-        let m2;
-        if (m[1]) {
-          if (m[1].length == 1) {
-            m2 = m[1].concat("0");
-          } else {
-            m2 = m[1].substring(0, 2);
-          }
+    beforeCreate: function() {
+      document
+        .getElementsByTagName('body')[0]
+        .setAttribute('style', 'background-color:#e9e9eb')
+    },
+    beforeRouteEnter(to, from, next) {
+      next(function(vm) {
+        vm.$client.system('documentTitle', {
+          title: '提现'
+        })
+      })
+    },
+    created() {
+        // 监听返回键
+        cookie.set('outKey', '0')
+        if (cookie.get('showHeader') == 'true') {
+            this.showHead = true
         } else {
-          m2 = "00";
+            this.showHead = false
         }
-        m = m1.concat("." + m2);
-        this.money = m;
-        if (this.money < 0.1) {
-          this.$store.dispatch("ERROR_MESSAGE", "最小提现金额为0.1元");
-          this.money = "";
-        } else if ( parseFloat(this.money) > parseFloat(this.maxNum) || parseFloat(this.money) > 800 ) {
-          this.$store.dispatch("ERROR_MESSAGE", "超过最大可提现金额");
-          this.money = "";
-        } else {
-          this.moneyOk = true;
+        let _this = this
+        setTimeout(function() {
+            if (cookie.get('S_L_S') !== '1') {
+                _this.$router.push({
+                    path: `/login`
+                })
+            }
+        }, 100)
+        this.drawInfo()
+    },
+    methods: {
+        getPayCount() {
+            // 失去焦点验证(暂时不做)
+            if (this.paycount) {
+                // 输入了信息，并失去焦点，后端交互
+                // 后端验证通过并且正确输了金额后，按钮颜色变为可点击
+                // this.loadTip = '正在验证'
+                // 支付宝验证
+                this.countOk = true
+            } else {}
+        },
+        // 金额验证截取
+        moneyDraw() {
+            this.moneyOk = false
+            if (this.money) {
+                let m = this.money.split('.')
+                let m1 = m[0]
+                let m2
+                if (m[1]) {
+                    if (m[1].length == 1) {
+                        m2 = m[1].concat('0')
+                    } else {
+                        m2 = m[1].substring(0, 2)
+                    }
+                } else {
+                    m2 = '00'
+                }
+                m = m1.concat('.' + m2)
+                this.money = m
+                if (this.money < 0.1) {
+                    this.$store.dispatch('ERROR_MESSAGE', '最小提现金额为0.1元')
+                    this.money = ''
+                } else if ( parseFloat(this.money) > parseFloat(this.maxNum) || parseFloat(this.money) > 800 ) {
+                    this.$store.dispatch('ERROR_MESSAGE', '超过最大可提现金额')
+                    this.money = ''
+                } else {
+                    this.moneyOk = true
+                }
+            }
+        },
+        drawalCash() {
+            let _this = this
+            if (_this.offDraw) {
+                _this.offDraw = false
+                // 后台交互提现，成功classMessage弹窗，失败message弹窗
+                this.$http.post('/ycorrect/user/center/withdraw', {}, {
+                    params: {
+                        amount: parseFloat(this.money),
+                        alipayNo: this.paycount
+                    }
+                }).then(response => {
+                    console.log(response.data.ret)
+                    if (response.data.ret_code == 0) {
+                        this.SuccessTip = '提现成功，24小时内到账'
+                        setTimeout(() => {
+                            _this.offDraw = true
+                            _this.SuccessTip = ''
+                            window.history.back()
+                        }, 1500)
+                    } else {
+                        _this.offDraw = true
+                        this.$store.dispatch('ERROR_MESSAGE', response.data.ret_msg)
+                    }
+                }, ({ response }) => {
+                    _this.offDraw = true
+                    this.$store.dispatch('ERROR_MESSAGE', '网络异常')
+                })
+            }
+            
+        },
+        drawInfo() {
+            let _this = this
+            this.$http.post('/ycorrect/user/center/getWithdrawInfo', {}, {
+                params: {}
+            }).then(response => {
+                console.log(response.data.ret)
+                if (response.data.ret_code == 0) {
+                    let data = response.data.ret
+                    this.firData = data
+                    this.dateIn = data.isRightTime
+                    this.maxNum = data.obalance.toFixed(2)
+                    if (parseFloat(this.maxNum) > 800 ) {
+                        this.maxNum = 800
+                    }
+                    this.withdrawToday = data.withdrawToday
+                } else {
+                    this.$store.dispatch('ERROR_MESSAGE', response.data.ret_msg)
+                }
+            }, ({ response }) => {
+                this.$store.dispatch('ERROR_MESSAGE', '网络异常')
+            })
         }
-      }
     },
-    drawalCash() {
-      let _this = this;
-      // 后台交互提现，成功classMessage弹窗，失败message弹窗
-
-      this.$http
-        .post(
-          "/ycorrect/user/center/withdraw",
-          {},
-          {
-            params: {
-              amount: parseFloat(this.money),
-              alipayNo: this.paycount
-            }
-          }
-        )
-        .then(
-          response => {
-            console.log(response.data.ret);
-            if (response.data.ret_code == 0) {
-              this.SuccessTip = "提现成功，24小时内到账";
-              setTimeout(() => {
-                _this.SuccessTip = "";
-                window.history.back();
-              }, 1500);
+    computed: {
+        btnColor() {
+            if (this.countOk && this.moneyOk && this.dateIn && !this.withdrawToday) {
+                return true
             } else {
-              this.$store.dispatch("ERROR_MESSAGE", response.data.ret_msg);
+                return true
             }
-          },
-          ({ response }) => {
-            this.$store.dispatch("ERROR_MESSAGE", "网络异常");
-          }
-        );
+        }
     },
-    drawInfo() {
-      let _this = this;
-      this.$http
-        .post(
-          "/ycorrect/user/center/getWithdrawInfo",
-          {},
-          {
-            params: {}
-          }
-        )
-        .then(
-          response => {
-            console.log(response.data.ret);
-            if (response.data.ret_code == 0) {
-              let data = response.data.ret;
-              this.firData = data;
-              this.dateIn = data.isRightTime;
-              this.maxNum = data.obalance.toFixed(2);
-              if (parseFloat(this.maxNum) > 800 ) {
-                this.maxNum = 800;
-              }
-              this.withdrawToday = data.withdrawToday;
-            } else {
-              this.$store.dispatch("ERROR_MESSAGE", response.data.ret_msg);
-            }
-          },
-          ({ response }) => {
-            this.$store.dispatch("ERROR_MESSAGE", "网络异常");
-          }
-        );
+    beforeDestroy: function() {
+        document.getElementsByTagName('body')[0].setAttribute('style', 'background-color:#fff')
     }
-  },
-  computed: {
-    btnColor() {
-      if (this.countOk && this.moneyOk && this.dateIn && !this.withdrawToday) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-  },
-  beforeDestroy: function() {
-    document
-      .getElementsByTagName("body")[0]
-      .setAttribute("style", "background-color:#fff");
-  }
-};
+}
 </script>
 
 <style scoped>

@@ -10,18 +10,18 @@
 
 <script>
 export default {
-  props: {
-    title: {
-      type: String,
-      default: ""
+    props: {
+        title: {
+            type: String,
+            default: ''
+        }
+    },
+    methods: {
+        back() {
+            window.history.back()
+        }
     }
-  },
-  methods: {
-    back() {
-      window.history.back();
-    }
-  }
-};
+}
 </script>
 
 <style scoped>

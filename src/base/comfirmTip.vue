@@ -15,30 +15,30 @@
 
 <script type="text/ecmascript-6">
 export default {
-  props: {
-    text: {
-      type: String,
-      default: "模拟批改共10道题<br/>请认真完成"
-    }
-  },
-  data() {
-    return {
-      showFlag: false
-    };
-  },
-  methods: {
-    show() {
-      this.showFlag = true;
+    props: {
+        text: {
+            type: String,
+            default: '模拟批改共10道题<br/>请认真完成'
+        }
     },
-    hide() {
-      this.showFlag = false;
+    data() {
+        return {
+            showFlag: false
+        }
     },
-    confirmTip() {
-      this.hide();
-      this.$emit("confirmTip");
+    methods: {
+        show() {
+            this.showFlag = true
+        },
+        hide() {
+            this.showFlag = false
+        },
+        confirmTip() {
+            this.hide()
+            this.$emit('confirmTip')
+        }
     }
-  }
-};
+}
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">

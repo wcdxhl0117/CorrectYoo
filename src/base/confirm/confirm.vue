@@ -17,55 +17,55 @@
 
 <script type="text/ecmascript-6">
 export default {
-  props: {
-    tipHead: {
-      type: String,
-      default: ""
+    props: {
+        tipHead: {
+            type: String,
+            default: ''
+        },
+        // 是否有取消按钮,默认有
+        noCancel: {
+            type: Boolean,
+            default: true
+        },
+        text: {
+            type: String,
+            default: ''
+        },
+        confirmBtnText: {
+            type: String,
+            default: '确定'
+        },
+        cancelBtnText: {
+            type: String,
+            default: '取消'
+        }
     },
-    // 是否有取消按钮,默认有
-    noCancel: {
-      type: Boolean,
-      default: true
+    data() {
+        return {
+            showFlag: false
+        }
     },
-    text: {
-      type: String,
-      default: ""
-    },
-    confirmBtnText: {
-      type: String,
-      default: "确定"
-    },
-    cancelBtnText: {
-      type: String,
-      default: "取消"
+    methods: {
+        show() {
+            this.showFlag = true
+            let bodyEl = document.getElementsByTagName('body')[0]
+            bodyEl.style.position = 'fixed'
+        },
+        hide() {
+            this.showFlag = false
+            let bodyEl = document.getElementsByTagName('body')[0]
+            bodyEl.style.position = 'static'
+        },
+        cancel() {
+            this.hide()
+            this.$emit('cancel')
+        },
+        confirm() {
+            this.hide()
+            this.$emit('confirm')
+        }
     }
-  },
-  data() {
-    return {
-      showFlag: false
-    };
-  },
-  methods: {
-    show() {
-      this.showFlag = true;
-      let bodyEl = document.getElementsByTagName("body")[0];
-      bodyEl.style.position = "fixed";
-    },
-    hide() {
-      this.showFlag = false;
-      let bodyEl = document.getElementsByTagName("body")[0];
-      bodyEl.style.position = "static";
-    },
-    cancel() {
-      this.hide();
-      this.$emit("cancel");
-    },
-    confirm() {
-      this.hide();
-      this.$emit("confirm");
-    }
-  }
-};
+}
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">

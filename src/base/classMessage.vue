@@ -13,16 +13,16 @@
 
 <script>
 export default {
-  props: {
-    message: {
-      type: String
-    },
-    imgSrc: {
-      type: String,
-      default: require("./sucess.png")
+    props: {
+        message: {
+            type: String
+        },
+        imgSrc: {
+            type: String,
+            default: require('./sucess.png')
+        }
     }
-  }
-};
+}
 </script>
 
 <style scoped>
